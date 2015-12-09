@@ -9,18 +9,6 @@ import (
 
 	"github.com/webcanvas/pinch/engine"
 	"github.com/webcanvas/pinch/environment"
-
-	// _ "github.com/webcanvas/pinch/plugins/golang"
-	// _ "github.com/webcanvas/pinch/plugins/host"
-	// _ "github.com/webcanvas/pinch/plugins/iis"
-	// _ "github.com/webcanvas/pinch/plugins/iisexpress"
-	// _ "github.com/webcanvas/pinch/plugins/liquibase"
-	// _ "github.com/webcanvas/pinch/plugins/msbuild"
-	// _ "github.com/webcanvas/pinch/plugins/mssql"
-	// _ "github.com/webcanvas/pinch/plugins/mysql"
-	// _ "github.com/webcanvas/pinch/plugins/nuget"
-	// _ "github.com/webcanvas/pinch/plugins/nunit"
-	// _ "github.com/webcanvas/pinch/plugins/sonar"
 )
 
 func errored(err error) {

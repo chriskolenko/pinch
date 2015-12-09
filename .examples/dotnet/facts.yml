@@ -6,3 +6,6 @@ environment:
 - CONFIGURATION="release"
 - OUTPUT_DIR=".build/output"
 - AGAIN=$$HOME
+
+facts:
+- nuget: "name=something"

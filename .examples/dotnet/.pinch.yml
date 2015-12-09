@@ -1,0 +1,31 @@
+---
+language: .net
+
+environment:
+- ARTIFACTORY_URL=""
+- CONFIGURATION="release"
+- OUTPUT_DIR=".build/output"
+
+facts:
+- nuget: "name=something"
+
+services:
+  - mssql: "db=test login=test:test"
+  - iisexpress: "localhost:3333"
+  - iis: "localhost/something"
+
+pre:
+  - nuget: "type=restore"
+  - gitversion: "updateassemblyinfo=true"
+  - msbuild: "path=*.sln targets=clean,build recurse=true"
+
+test:
+  - liquibase: "action=upgrade contexts=dll,test,something url=$$ARTIFACTORY_URL/$$MY/$$DB"
+  - liquibase: "action=upgrade contexts=dll,test,something path=db"
+  - host: "path=*app*.nupkg"
+  - nunit: "files=*Tests*.dll recurse=true"
+
+post:
+  - sonar: ""
+  - nuget: "path=*.nuspec"
+  - nuget: "path=$$OUTPUT/*.nupkg"

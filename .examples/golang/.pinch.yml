@@ -1,0 +1,12 @@
+---
+language: go
+
+environment:
+- OUTPUT_DIR=".build/output"
+- GO15VENDOREXPERIMENT="1"
+
+services:
+  - mysql: "db=test login=test:test"
+
+test:
+  - go: "action=test"

@@ -5,12 +5,12 @@ import (
 )
 
 func TestFactPlugin(t *testing.T) {
-	factplugin, err := SetupFactPlugin("test")
+	plugin, err := SetupFactPlugin("test")
 	if err != nil {
 		t.Fatalf("SetupFactPlugin: %v", err)
 	}
 
-	if factplugin == nil {
-		t.Fatalf("Fact Plugin is nil")
+	if plugin == nil {
+		t.Fatalf("Plugin is nil")
 	}
 }

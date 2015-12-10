@@ -9,6 +9,8 @@ import (
 
 	"github.com/webcanvas/pinch/engine"
 	"github.com/webcanvas/pinch/environment"
+
+	_ "github.com/webcanvas/pinch/plugins/nuget"
 )
 
 func errored(err error) {

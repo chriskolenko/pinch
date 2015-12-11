@@ -9,6 +9,7 @@ import (
 
 	"github.com/webcanvas/pinch/engine"
 	"github.com/webcanvas/pinch/environment"
+	"github.com/webcanvas/pinch/pinchers"
 
 	_ "github.com/webcanvas/pinch/plugins/nuget"
 )
@@ -27,15 +28,15 @@ func pinch(c *cli.Context) {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
-	env := environment.Load(dotenv)
-
-	eng, err := engine.Load(pinchfile)
+	pinch, err := pinchers.Load(pinchfile)
 	if err != nil {
 		errored(err)
 		return
 	}
 
-	err = eng.Run(env)
+	env := environment.Load(dotenv)
+
+	err = engine.Run(env, pinch)
 	if err != nil {
 		errored(err)
 	}

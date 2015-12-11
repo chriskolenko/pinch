@@ -1,4 +1,4 @@
-package engine
+package pinchers
 
 import (
 	"reflect"
@@ -11,7 +11,9 @@ func TestParser(t *testing.T) {
 	s3 := " "
 	s4 := "hello \"what's\" up"
 
-	p1 := ToMap(s1)
+	p1 := make(RuntimeVarMap)
+	FillRuntimeVarMap(&p1, s1)
+
 	p2 := ToMap(s2)
 	p3 := ToMap(s3)
 	p4 := ToMap(s4)
@@ -32,5 +34,20 @@ func TestParser(t *testing.T) {
 	}
 	if !reflect.DeepEqual(p4, c4) {
 		t.Error(s4, p4, c4)
+	}
+}
+
+func TestParseFactPincher(t *testing.T) {
+	test := map[string]string{
+		"test": "a=1 b=2",
+	}
+
+	pincher, err := ToFactPincher(test)
+	if err != nil {
+		t.Fatalf("ParseFactPincher: %v", err)
+	}
+
+	if pincher == nil {
+		t.Fatalf("Pincher is nil")
 	}
 }

@@ -2,56 +2,40 @@ package engine
 
 import (
 	"errors"
-	"io/ioutil"
 
-	"gopkg.in/yaml.v2"
-
+	"github.com/Sirupsen/logrus"
 	"github.com/webcanvas/pinch/environment"
+	"github.com/webcanvas/pinch/pinchers"
 )
 
 // ErrNoPinch no parsed pinch file err
 var ErrNoPinch = errors.New("No pinch")
 
-// Engine is the brains of the pinch
-type Engine struct {
-	Pinch *Pinch
-}
-
 // Run will do the pinch
-func (e *Engine) Run(env environment.Env) error {
-	if e.Pinch == nil {
+func Run(env environment.Env, pinch *pinchers.Pinch) error {
+	if pinch == nil {
 		return ErrNoPinch
 	}
 
-	ctx := NewPinchContext(env)
+	ctx := NewContext(env)
 
-	for key, value := range e.Pinch.Environment.Variables {
-		err := ctx.AddEnvironmentVariable(key, value)
+	for key, value := range pinch.Environment.Variables {
+		v, err := value.String(ctx.Env)
+		if err != nil {
+			return err
+		}
+
+		logrus.WithFields(logrus.Fields{"key": key, "value": v}).Debug("Adding environment value")
+		ctx.Env[key] = v
+	}
+
+	// foreach fact run.
+	for _, fact := range pinch.FactPinchers.Pinchers {
+		err := ctx.RunFact(fact)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-// Load turns a pinch file into a runable pinch
-func Load(file string) (*Engine, error) {
-	// load up the config.
-	raw, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	pinch := &Pinch{}
-	err = yaml.Unmarshal([]byte(raw), pinch)
-	if err != nil {
-		return nil, err
-	}
-
-	eng := &Engine{
-		Pinch: pinch,
-	}
-
-	return eng, nil
 }

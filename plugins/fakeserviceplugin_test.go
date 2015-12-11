@@ -1,4 +1,4 @@
-package engine
+package plugins
 
 type fakeserviceplugin struct{}
 

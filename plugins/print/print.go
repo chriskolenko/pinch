@@ -34,6 +34,6 @@ func (n *print) Exec(opts map[string]string) (*models.Result, error) {
 func init() {
 	p := &print{}
 	plugins.RegisterFactPlugin("print", p)
-	plugins.RegisterServicePlugin("print", p)
+	// plugins.RegisterServicePlugin("print", p)
 	plugins.RegisterPinchPlugin("print", p)
 }

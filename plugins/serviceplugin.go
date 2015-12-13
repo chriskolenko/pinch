@@ -3,6 +3,8 @@ package plugins
 import (
 	"fmt"
 	"sync"
+
+	"github.com/webcanvas/pinch/shared/models"
 )
 
 var (
@@ -11,7 +13,10 @@ var (
 )
 
 // ServicePlugin default interface for a pinch service plugin
-type ServicePlugin interface{}
+type ServicePlugin interface {
+	Setup() error
+	Ensure(map[string]string) (*models.Result, error)
+}
 
 // RegisterServicePlugin allows external packages to register a pinch service plugin
 func RegisterServicePlugin(name string, plugin ServicePlugin) {

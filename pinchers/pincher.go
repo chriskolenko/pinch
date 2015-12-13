@@ -72,6 +72,32 @@ func NewFactPincher(src map[string]string) (*Pincher, error) {
 	return pincher, nil
 }
 
+// NewServicePincher creates a pincher from a service
+func NewServicePincher(src map[string]string) (*Pincher, error) {
+	var pincher *Pincher
+
+	for key, value := range src {
+		// find the plugin
+		plugin, err := plugins.SetupServicePlugin(key)
+		if err != nil {
+			return pincher, err
+		}
+
+		logrus.WithFields(logrus.Fields{"plugin": plugin}).Debug("Plugin found")
+
+		rtm := make(RuntimeVarMap)
+		FillRuntimeVarMap(rtm, value)
+
+		// create the pincher.
+		pincher = &Pincher{
+			runtimeVars: rtm,
+			runner:      plugin.Ensure,
+		}
+	}
+
+	return pincher, nil
+}
+
 // NewPinchPincher creates a pincher from a test
 func NewPinchPincher(src map[string]string) (*Pincher, error) {
 	var pincher *Pincher

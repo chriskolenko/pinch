@@ -34,7 +34,7 @@ func Run(env environment.Env, pinch *pinchers.Pinch) error {
 	// foreach fact run.
 	for _, pincher := range pinch.Facts.Pinchers {
 		// lets run it.
-		result, err := pincher.Pinch(ctx.Env, ctx.Facts)
+		result, err := pincher.Pinch(ctx.Facts, ctx.Env)
 		if err != nil {
 			return err
 		}
@@ -45,8 +45,31 @@ func Run(env environment.Env, pinch *pinchers.Pinch) error {
 		}
 	}
 
-	// TODO Service
-	// TODO Pre
+	for _, pincher := range pinch.Services.Pinchers {
+		// lets run it
+		result, err := pincher.Pinch(ctx.Facts, ctx.Env)
+		if err != nil {
+			return err
+		}
+
+		for key, value := range result.Facts {
+			logrus.WithFields(logrus.Fields{"key": key, "value": value}).Debug("Adding fact value")
+			ctx.Facts[key] = value
+		}
+	}
+
+	for _, pincher := range pinch.Pre.Pinchers {
+		// lets run it
+		result, err := pincher.Pinch(ctx.Facts, ctx.Env)
+		if err != nil {
+			return err
+		}
+
+		for key, value := range result.Facts {
+			logrus.WithFields(logrus.Fields{"key": key, "value": value}).Debug("Adding fact value")
+			ctx.Facts[key] = value
+		}
+	}
 
 	for _, pincher := range pinch.Tests.Pinchers {
 		// lets run it.
@@ -60,7 +83,18 @@ func Run(env environment.Env, pinch *pinchers.Pinch) error {
 		}
 	}
 
-	// TODO Post
+	for _, pincher := range pinch.Post.Pinchers {
+		// lets run it
+		result, err := pincher.Pinch(ctx.Facts, ctx.Env)
+		if err != nil {
+			return err
+		}
+
+		for key, value := range result.Facts {
+			logrus.WithFields(logrus.Fields{"key": key, "value": value}).Debug("Adding fact value")
+			ctx.Facts[key] = value
+		}
+	}
 
 	return nil
 }

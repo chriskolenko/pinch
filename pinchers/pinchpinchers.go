@@ -2,14 +2,14 @@ package pinchers
 
 import "github.com/Sirupsen/logrus"
 
-// FactPinchers is the parsed fact pinchers from a pinch file
-type FactPinchers struct {
+// PinchPinchers is the parsed test pinchers from a pinch file
+type PinchPinchers struct {
 	Errors   []error
 	Pinchers []*Pincher
 }
 
-// UnmarshalYAML parses fact pinchers from a pinch file
-func (pe *FactPinchers) UnmarshalYAML(unmarshal func(interface{}) error) error {
+// UnmarshalYAML parses test pinchers from a pinch file
+func (pe *PinchPinchers) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var maps []map[string]string
 	if err := unmarshal(&maps); err != nil {
 		logrus.WithFields(logrus.Fields{"err": err}).Debug("Has err when parsing facts")
@@ -18,7 +18,7 @@ func (pe *FactPinchers) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	for _, m := range maps {
 		// we a fact pincher.
-		pincher, err := NewFactPincher(m)
+		pincher, err := NewPinchPincher(m)
 		if err != nil {
 			pe.Errors = append(pe.Errors, err)
 		} else {

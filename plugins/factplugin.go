@@ -3,6 +3,8 @@ package plugins
 import (
 	"fmt"
 	"sync"
+
+	"github.com/webcanvas/pinch/shared/models"
 )
 
 var (
@@ -11,7 +13,10 @@ var (
 )
 
 // FactPlugin default interface for a pinch fact plugin
-type FactPlugin interface{}
+type FactPlugin interface {
+	Setup() error
+	Gather(map[string]string) (*models.Result, error)
+}
 
 // RegisterFactPlugin allows external packages to register a pinch fact plugin
 func RegisterFactPlugin(name string, plugin FactPlugin) {
@@ -40,5 +45,6 @@ func SetupFactPlugin(name string) (FactPlugin, error) {
 		return nil, fmt.Errorf("SetupFactPlugin: unknown plugin %q (forgotten import?)", name)
 	}
 
-	return plugin, nil
+	err := plugin.Setup()
+	return plugin, err
 }

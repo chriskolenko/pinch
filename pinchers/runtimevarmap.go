@@ -34,7 +34,7 @@ func FillRuntimeVarMap(dest RuntimeVarMap, str string) {
 		case ch == ' ':
 			if groupingch == nil {
 				if key != "" {
-					dest[key] = RuntimeVar{value}
+					dest[key] = NewRuntimeVar(value)
 					key = ""
 					value = ""
 					iskey = true
@@ -52,46 +52,6 @@ func FillRuntimeVarMap(dest RuntimeVarMap, str string) {
 	}
 
 	if key != "" {
-		dest[key] = RuntimeVar{value}
+		dest[key] = NewRuntimeVar(value)
 	}
 }
-
-// // ParseFactPincher will convert a map into a fact pincher
-// func ParseFactPincher(source map[string]string) (*FactPincher, error) {
-// 	var pincher *FactPincher
-//
-// 	for key, value := range source {
-// 		// if we don't have a pincher
-// 		if pincher == nil {
-//
-// 			// load the fact plugin
-// 			plugin, err := SetupFactPlugin(key)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-//
-// 			// parse opts.
-// 			opts := ToMap(value)
-//
-// 			resolver := func(env environment.Env) (*FactResult, error) {
-// 				// TODO check if we have a problem with the opts.
-// 				// because we are in a loop etc.
-//
-// 				// TODO check plugin because we are in a loop.
-//
-// 				// resolve values.
-// 				return nil, nil
-// 			}
-//
-// 			// create the fact pincher
-// 			pincher = &FactPincher{
-// 				resolver: resolver,
-// 			}
-// 		} else {
-// 			// TODO what about adapter?
-// 		}
-//
-// 	}
-//
-// 	return pincher, nil
-// }

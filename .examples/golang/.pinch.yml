@@ -5,8 +5,12 @@ environment:
 - OUTPUT_DIR=".build/output"
 - GO15VENDOREXPERIMENT="1"
 
+facts:
+  - git: "action=longhash"
+
 services:
   - mysql: "db=test login=test:test"
 
 test:
+  - print: "msg=\"Hi all what's the longhash $$LongHash\""
   - go: "action=test"

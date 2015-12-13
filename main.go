@@ -8,10 +8,13 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/webcanvas/pinch/engine"
-	"github.com/webcanvas/pinch/environment"
 	"github.com/webcanvas/pinch/pinchers"
+	"github.com/webcanvas/pinch/shared/environment"
 
+	_ "github.com/webcanvas/pinch/plugins/git"
+	_ "github.com/webcanvas/pinch/plugins/golang"
 	_ "github.com/webcanvas/pinch/plugins/nuget"
+	_ "github.com/webcanvas/pinch/plugins/print"
 )
 
 func errored(err error) {

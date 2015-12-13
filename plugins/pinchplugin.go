@@ -3,6 +3,8 @@ package plugins
 import (
 	"fmt"
 	"sync"
+
+	"github.com/webcanvas/pinch/shared/models"
 )
 
 var (
@@ -11,7 +13,10 @@ var (
 )
 
 // PinchPlugin default interface for a pinch pinch plugin
-type PinchPlugin interface{}
+type PinchPlugin interface {
+	Setup() error
+	Exec(map[string]string) (*models.Result, error)
+}
 
 // RegisterPinchPlugin allows external packages to register a pinch pinch plugin
 func RegisterPinchPlugin(name string, plugin PinchPlugin) {
@@ -40,5 +45,6 @@ func SetupPinchPlugin(name string) (PinchPlugin, error) {
 		return nil, fmt.Errorf("SetupPinchPlugin: unknown plugin %q (forgotten import?)", name)
 	}
 
-	return plugin, nil
+	err := plugin.Setup()
+	return plugin, err
 }

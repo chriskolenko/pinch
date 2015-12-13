@@ -11,6 +11,7 @@ type Pinch struct {
 	Language    string           `yaml:"language"`
 	Environment PinchEnvironment `yaml:"environment"`
 	Facts       FactPinchers     `yaml:"facts"`
+	Tests       PinchPinchers    `yaml:"test"`
 }
 
 // Load turns a pinch file into a runable pinch

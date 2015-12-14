@@ -20,6 +20,7 @@ import (
 	_ "github.com/webcanvas/pinch/plugins/liquibase"
 	_ "github.com/webcanvas/pinch/plugins/msbuild"
 	_ "github.com/webcanvas/pinch/plugins/mssql"
+	_ "github.com/webcanvas/pinch/plugins/mysql"
 	_ "github.com/webcanvas/pinch/plugins/nuget"
 	_ "github.com/webcanvas/pinch/plugins/nunit"
 	_ "github.com/webcanvas/pinch/plugins/print"

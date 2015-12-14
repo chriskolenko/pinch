@@ -46,7 +46,7 @@ func (g *Git) Setup() error {
 }
 
 // Gather return facts for git based on options
-func (g *Git) Gather(data map[string]string) (*models.Result, error) {
+func (g *Git) Gather(data map[string]string) (models.Result, error) {
 	// get the version of git.
 	opts := &FactOpts{}
 	mapstructure.Decode(data, &opts)
@@ -66,35 +66,35 @@ func (g *Git) Gather(data map[string]string) (*models.Result, error) {
 		return getLongHash(g.commander)
 	}
 
-	return nil, nil
+	return models.Result{}, nil
 }
 
-func getShortHash(cmd *commanders.Commander) (*models.Result, error) {
+func getShortHash(cmd *commanders.Commander) (result models.Result, err error) {
 	args := []string{"log", "--pretty=format:'%h'", "-n", "1"}
 	output, err := cmd.ExecOutput(args...)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	facts := map[string]string{
 		"ShortHash": string(output),
 	}
-
-	return &models.Result{Facts: facts}, nil
+	result.Facts = facts
+	return
 }
 
-func getLongHash(cmd *commanders.Commander) (*models.Result, error) {
+func getLongHash(cmd *commanders.Commander) (result models.Result, err error) {
 	args := []string{"log", "--pretty=format:'%H'", "-n", "1"}
 	output, err := cmd.ExecOutput(args...)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	facts := map[string]string{
 		"LongHash": string(output),
 	}
-
-	return &models.Result{Facts: facts}, nil
+	result.Facts = facts
+	return
 }
 
 func init() {

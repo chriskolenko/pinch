@@ -15,7 +15,7 @@ var (
 // ServicePlugin default interface for a pinch service plugin
 type ServicePlugin interface {
 	Setup() error
-	Ensure(map[string]string) (*models.Result, error)
+	Ensure(map[string]string) (models.Result, error)
 }
 
 // RegisterServicePlugin allows external packages to register a pinch service plugin

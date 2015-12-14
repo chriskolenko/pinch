@@ -7,7 +7,7 @@ import (
 )
 
 // PinchRunner to make it easier to read
-type PinchRunner func(map[string]string) (*models.Result, error)
+type PinchRunner func(map[string]string) (models.Result, error)
 
 // Pincher the encapsulated pincher from the pinch file
 type Pincher struct {
@@ -16,7 +16,7 @@ type Pincher struct {
 }
 
 // Pinch runs the commands and gives results
-func (p *Pincher) Pinch(maps ...map[string]string) (*models.Result, error) {
+func (p *Pincher) Pinch(maps ...map[string]string) (models.Result, error) {
 	// create options.
 	opts := make(map[string]string)
 	for key, value := range p.runtimeVars {
@@ -36,7 +36,7 @@ func (p *Pincher) Pinch(maps ...map[string]string) (*models.Result, error) {
 
 		// if the error is still not nil return
 		if err != nil {
-			return nil, err
+			return models.Result{}, err
 		}
 
 		// add the value to the opts

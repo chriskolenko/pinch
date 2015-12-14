@@ -14,21 +14,21 @@ func (n *print) Setup() error {
 }
 
 // Gather gathers all the facts for a pinch
-func (n *print) Gather(opts map[string]string) (*models.Result, error) {
+func (n *print) Gather(opts map[string]string) (models.Result, error) {
 	msg, ok := opts["msg"]
 	if ok {
 		logrus.Info("msg: ", msg)
 	}
-	return &models.Result{}, nil
+	return models.Result{}, nil
 }
 
 // Exec runs the pinch
-func (n *print) Exec(opts map[string]string) (*models.Result, error) {
+func (n *print) Exec(opts map[string]string) (models.Result, error) {
 	msg, ok := opts["msg"]
 	if ok {
 		logrus.Info("msg: ", msg)
 	}
-	return &models.Result{}, nil
+	return models.Result{}, nil
 }
 
 func init() {

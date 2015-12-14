@@ -2,7 +2,9 @@
 language: .net
 
 environment:
-- ARTIFACTORY_URL=""
+- DB="dbconnenctionstring"
+- MY="something_here"
+- ARTIFACTORY_URL="hi"
 - CONFIGURATION="release"
 - OUTPUT_DIR=".build/output"
 
@@ -28,4 +30,4 @@ test:
 post:
   - sonar: ""
   - nuget: "path=*.nuspec"
-  - nuget: "path=$$OUTPUT/*.nupkg"
+  - nuget: "path=$$OUTPUT_DIR/*.nupkg"

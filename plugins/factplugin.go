@@ -15,7 +15,7 @@ var (
 // FactPlugin default interface for a pinch fact plugin
 type FactPlugin interface {
 	Setup() error
-	Gather(map[string]string) (*models.Result, error)
+	Gather(map[string]string) (models.Result, error)
 }
 
 // RegisterFactPlugin allows external packages to register a pinch fact plugin

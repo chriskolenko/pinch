@@ -15,7 +15,7 @@ var (
 // PinchPlugin default interface for a pinch pinch plugin
 type PinchPlugin interface {
 	Setup() error
-	Exec(map[string]string) (*models.Result, error)
+	Exec(map[string]string) (models.Result, error)
 }
 
 // RegisterPinchPlugin allows external packages to register a pinch pinch plugin

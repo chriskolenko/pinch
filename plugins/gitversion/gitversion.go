@@ -1,4 +1,4 @@
-package golang
+package gitversion
 
 import (
 	"regexp"
@@ -11,13 +11,13 @@ import (
 
 var versionex = regexp.MustCompile("[0-9.]+")
 
-type golang struct {
+type gitversion struct {
 	commander *commanders.Commander
 	Version   string
 }
 
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *golang) Setup() error {
+func (g *gitversion) Setup() error {
 	commander, err := commanders.Open("go")
 	if err != nil {
 		return err
@@ -38,12 +38,12 @@ func (g *golang) Setup() error {
 	return nil
 }
 
-// Exec runs the pinch
-func (g *golang) Exec(opts map[string]string) (models.Result, error) {
+// Ensure setups the service
+func (g *gitversion) Exec(opts map[string]string) (models.Result, error) {
 	return models.Result{}, nil
 }
 
 func init() {
-	g := &golang{}
-	plugins.RegisterPinchPlugin("go", g)
+	g := &gitversion{}
+	plugins.RegisterPinchPlugin("gitversion", g)
 }

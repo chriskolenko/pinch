@@ -45,8 +45,13 @@ func (n *NuGet) Setup() error {
 }
 
 // Gather gathers all the facts for a pinch
-func (n *NuGet) Gather(opts map[string]string) (*models.Result, error) {
-	return &models.Result{}, nil
+func (n *NuGet) Gather(opts map[string]string) (models.Result, error) {
+	return models.Result{}, nil
+}
+
+// Exec runs the pinch
+func (n *NuGet) Exec(opts map[string]string) (models.Result, error) {
+	return models.Result{}, nil
 }
 
 func getVersion(data []byte) (string, error) {
@@ -72,4 +77,5 @@ func getVersion(data []byte) (string, error) {
 
 func init() {
 	plugins.RegisterFactPlugin("nuget", &NuGet{})
+	plugins.RegisterPinchPlugin("nuget", &NuGet{})
 }

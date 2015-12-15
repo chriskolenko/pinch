@@ -13,15 +13,14 @@ import (
 
 var versionex = regexp.MustCompile("[0-9.]+")
 
-// NuGet this is exported just for fun. This will be used inside the pinch engine
-type NuGet struct {
+type nuget struct {
 	commander *commanders.Commander
 
 	Version string
 }
 
 // Setup initializes the NuGet plugin
-func (n *NuGet) Setup() error {
+func (n *nuget) Setup() error {
 
 	cmd, err := commanders.Open("nuget.exe", "./", "./.nuget")
 	if err != nil {
@@ -44,13 +43,8 @@ func (n *NuGet) Setup() error {
 	return nil
 }
 
-// Gather gathers all the facts for a pinch
-func (n *NuGet) Gather(opts map[string]string) (models.Result, error) {
-	return models.Result{}, nil
-}
-
 // Exec runs the pinch
-func (n *NuGet) Exec(opts map[string]string) (models.Result, error) {
+func (n *nuget) Exec(opts map[string]string) (models.Result, error) {
 	return models.Result{}, nil
 }
 
@@ -76,6 +70,5 @@ func getVersion(data []byte) (string, error) {
 }
 
 func init() {
-	plugins.RegisterFactPlugin("nuget", &NuGet{})
-	plugins.RegisterPinchPlugin("nuget", &NuGet{})
+	plugins.RegisterPinchPlugin("nuget", &nuget{})
 }

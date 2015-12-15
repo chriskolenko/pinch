@@ -11,6 +11,8 @@ import (
 	"github.com/webcanvas/pinch/pinchers"
 	"github.com/webcanvas/pinch/shared/environment"
 
+	_ "github.com/denisenkom/go-mssqldb"
+
 	_ "github.com/webcanvas/pinch/plugins/git"
 	_ "github.com/webcanvas/pinch/plugins/gitversion"
 	_ "github.com/webcanvas/pinch/plugins/golang"
@@ -68,10 +70,12 @@ func main() {
 		cli.StringFlag{
 			Name:  "pinchfile, p",
 			Usage: "Specify an alternate pinch file (default: .pinch.yml)",
+			Value: ".pinch.yml",
 		},
 		cli.StringFlag{
 			Name:  "env, e",
 			Usage: "Specify additional environment variables (default: .env)",
+			Value: ".env",
 		},
 	}
 

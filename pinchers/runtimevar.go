@@ -4,11 +4,13 @@ import (
 	"errors"
 	"regexp"
 	"strings"
+
+	"github.com/Sirupsen/logrus"
 )
 
-var runtimeregexp = regexp.MustCompile(`\$\$([a-zA-Z0-9]+)`)
+var runtimeregexp = regexp.MustCompile(`\$\$([a-zA-Z0-9]_+)`)
 
-// ErrMissingValue is the error that occurs when the runtime variable cannot replace placeholders
+// ErrMissingRuntimeVal is the error that occurs when the runtime variable cannot replace placeholders
 var ErrMissingRuntimeVal = errors.New("Missing value")
 
 // RuntimeVar holds a string and allows replacing of placeholders ie $$something
@@ -30,10 +32,11 @@ func (r *RuntimeVar) String(vars map[string]string) (string, error) {
 	// find all the replaces.
 	for _, r := range r.replaces {
 		// remove the $$
-		key := strings.Trim(r, "$")
+		key := strings.Trim(r, "$$")
 		val, ok := vars[key]
 		if !ok {
 			err = ErrMissingRuntimeVal
+			logrus.WithFields(logrus.Fields{"key": key}).Debug("Could not find key inside vars")
 		} else {
 			str = strings.Replace(str, r, val, -1)
 		}

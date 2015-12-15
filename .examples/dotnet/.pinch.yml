@@ -8,16 +8,16 @@ environment:
 - CONFIGURATION="release"
 - OUTPUT_DIR=".build/output"
 
-facts:
-- nuget: "name=something"
+# facts:
+# - nuget: "name=something"
 
 services:
-  - mssql: "db=test login=test:test"
-  - iisexpress: "localhost:3333"
-  - iis: "localhost/something"
+  - mssql: ""
+  # - iisexpress: "localhost:3333"
+  # - iis: "localhost/something"
 
 pre:
-  - nuget: "type=restore"
+  - nuget: "action=restore"
   - gitversion: "updateassemblyinfo=true"
   - msbuild: "path=*.sln targets=clean,build recurse=true"
 

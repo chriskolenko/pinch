@@ -77,16 +77,16 @@ func NewServicePincher(src map[string]string) (*Pincher, error) {
 	var pincher *Pincher
 
 	for key, value := range src {
+		rtm := make(RuntimeVarMap)
+		FillRuntimeVarMap(rtm, value)
+
 		// find the plugin
 		plugin, err := plugins.SetupServicePlugin(key)
 		if err != nil {
 			return pincher, err
 		}
 
-		logrus.WithFields(logrus.Fields{"plugin": plugin}).Debug("Plugin found")
-
-		rtm := make(RuntimeVarMap)
-		FillRuntimeVarMap(rtm, value)
+		logrus.WithFields(logrus.Fields{"key": key, "plugin": plugin}).Debug("Plugin found")
 
 		// create the pincher.
 		pincher = &Pincher{
@@ -103,16 +103,16 @@ func NewPinchPincher(src map[string]string) (*Pincher, error) {
 	var pincher *Pincher
 
 	for key, value := range src {
+		rtm := make(RuntimeVarMap)
+		FillRuntimeVarMap(rtm, value)
+
 		// find the plugin
 		plugin, err := plugins.SetupPinchPlugin(key)
 		if err != nil {
 			return pincher, err
 		}
 
-		logrus.WithFields(logrus.Fields{"plugin": plugin}).Debug("Plugin found")
-
-		rtm := make(RuntimeVarMap)
-		FillRuntimeVarMap(rtm, value)
+		logrus.WithFields(logrus.Fields{"key": key, "plugin": plugin}).Debug("Plugin found")
 
 		// create the pincher.
 		pincher = &Pincher{

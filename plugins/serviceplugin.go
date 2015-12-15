@@ -45,5 +45,6 @@ func SetupServicePlugin(name string) (ServicePlugin, error) {
 		return nil, fmt.Errorf("SetupServicePlugin: unknown plugin %q (forgotten import?)", name)
 	}
 
-	return plugin, nil
+	err := plugin.Setup()
+	return plugin, err
 }

@@ -2,8 +2,8 @@
 language: go
 
 environment:
-- OUTPUT_DIR=".build/output"
-- GO15VENDOREXPERIMENT="1"
+  - OUTPUT_DIR=".build/output"
+  - GO15VENDOREXPERIMENT="1"
 
 facts:
   - git: "action=longhash"
@@ -11,6 +11,8 @@ facts:
 services:
   - mysql: "db=test login=test:test"
 
+pre:
+  - go: "action=build -ldflags='-X main.version=0.2.3'"
+
 test:
-  - print: "msg=\"Hi all what's the longhash $$LongHash\""
   - go: "action=test"

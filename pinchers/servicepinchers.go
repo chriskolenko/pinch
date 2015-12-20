@@ -5,7 +5,7 @@ import "github.com/Sirupsen/logrus"
 // ServicePinchers is the parsed service pinchers from a pinch file
 type ServicePinchers struct {
 	Errors   []error
-	Pinchers []*Pincher
+	Pinchers []Pincher
 }
 
 // UnmarshalYAML parses fact pinchers from a pinch file

@@ -9,8 +9,8 @@ type Context struct {
 }
 
 // NewContext creates a new context
-func NewContext(env environment.Env) *Context {
-	return &Context{
+func NewContext(env environment.Env) Context {
+	return Context{
 		Env:   env,
 		Facts: make(map[string]string),
 	}

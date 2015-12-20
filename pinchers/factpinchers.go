@@ -5,7 +5,7 @@ import "github.com/Sirupsen/logrus"
 // FactPinchers is the parsed fact pinchers from a pinch file
 type FactPinchers struct {
 	Errors   []error
-	Pinchers []*Pincher
+	Pinchers []Pincher
 }
 
 // UnmarshalYAML parses fact pinchers from a pinch file

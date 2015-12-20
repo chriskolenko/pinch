@@ -8,7 +8,7 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-var runtimeregexp = regexp.MustCompile(`\$\$([a-zA-Z0-9]_+)`)
+var runtimeregexp = regexp.MustCompile(`\$\$([a-zA-Z0-9_]+)`)
 
 // ErrMissingRuntimeVal is the error that occurs when the runtime variable cannot replace placeholders
 var ErrMissingRuntimeVal = errors.New("Missing value")
@@ -31,6 +31,7 @@ func (r *RuntimeVar) String(vars map[string]string) (string, error) {
 
 	// find all the replaces.
 	for _, r := range r.replaces {
+		logrus.WithFields(logrus.Fields{"r": r}).Debug("Replacement values")
 		// remove the $$
 		key := strings.Trim(r, "$$")
 		val, ok := vars[key]

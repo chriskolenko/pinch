@@ -12,16 +12,21 @@ func TestParser(t *testing.T) {
 	s4 := "hello \"what's\" up"
 
 	p1 := make(RuntimeVarMap)
-	FillRuntimeVarMap(&p1, s1)
+	p1.Fill(s1)
 
-	p2 := ToMap(s2)
-	p3 := ToMap(s3)
-	p4 := ToMap(s4)
+	p2 := make(RuntimeVarMap)
+	p2.Fill(s2)
 
-	c1 := map[string]RuntimeVar{"hello": RuntimeVar{"world"}}
-	c2 := map[string]RuntimeVar{"something": RuntimeVar{"yep else"}, "something2": RuntimeVar{"hello  =  = something"}}
+	p3 := make(RuntimeVarMap)
+	p3.Fill(s3)
+
+	p4 := make(RuntimeVarMap)
+	p4.Fill(s4)
+
+	c1 := map[string]RuntimeVar{"hello": NewRuntimeVar("world")}
+	c2 := map[string]RuntimeVar{"something": NewRuntimeVar("yep else"), "something2": NewRuntimeVar("hello  =  = something")}
 	c3 := map[string]RuntimeVar{}
-	c4 := map[string]RuntimeVar{"hello": RuntimeVar{""}, "what's": RuntimeVar{""}, "up": RuntimeVar{""}}
+	c4 := map[string]RuntimeVar{"hello": NewRuntimeVar(""), "what's": NewRuntimeVar(""), "up": NewRuntimeVar("")}
 
 	if !reflect.DeepEqual(p1, c1) {
 		t.Error(s1, p1, c1)
@@ -37,17 +42,18 @@ func TestParser(t *testing.T) {
 	}
 }
 
-func TestParseFactPincher(t *testing.T) {
-	test := map[string]string{
-		"test": "a=1 b=2",
-	}
-
-	pincher, err := ToFactPincher(test)
-	if err != nil {
-		t.Fatalf("ParseFactPincher: %v", err)
-	}
-
-	if pincher == nil {
-		t.Fatalf("Pincher is nil")
-	}
-}
+//
+// func TestParseFactPincher(t *testing.T) {
+// 	test := map[string]string{
+// 		"test": "a=1 b=2",
+// 	}
+//
+// 	pincher, err := ToFactPincher(test)
+// 	if err != nil {
+// 		t.Fatalf("ParseFactPincher: %v", err)
+// 	}
+//
+// 	if pincher == nil {
+// 		t.Fatalf("Pincher is nil")
+// 	}
+// }

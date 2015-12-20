@@ -5,7 +5,7 @@ import "github.com/Sirupsen/logrus"
 // PinchPinchers is the parsed test pinchers from a pinch file
 type PinchPinchers struct {
 	Errors   []error
-	Pinchers []*Pincher
+	Pinchers []Pincher
 }
 
 // UnmarshalYAML parses test pinchers from a pinch file

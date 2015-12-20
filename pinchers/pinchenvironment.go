@@ -4,7 +4,7 @@ import "github.com/Sirupsen/logrus"
 
 // PinchEnvironment has all the environment variables from the pinch files
 type PinchEnvironment struct {
-	Variables map[string]RuntimeVar
+	Variables RuntimeVarMap
 }
 
 // UnmarshalYAML parses environment variables from a pinch file
@@ -15,9 +15,9 @@ func (pe *PinchEnvironment) UnmarshalYAML(unmarshal func(interface{}) error) err
 		return err
 	}
 
-	variables := make(map[string]RuntimeVar)
+	variables := make(RuntimeVarMap)
 	for _, str := range strs {
-		FillRuntimeVarMap(variables, str)
+		variables.Fill(str)
 	}
 
 	pe.Variables = variables

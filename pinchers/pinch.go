@@ -11,6 +11,7 @@ import (
 // Pinch is the parse pinched file
 type Pinch struct {
 	Language    string           `yaml:"language"`
+	Includes    PinchIncludes    `yaml:"includes"`
 	Environment PinchEnvironment `yaml:"environment"`
 	Facts       FactPinchers     `yaml:"facts"`
 	Services    ServicePinchers  `yaml:"services"`
@@ -20,19 +21,20 @@ type Pinch struct {
 }
 
 // Load turns a pinch file into a runable pinch
-func Load(file string) (*Pinch, error) {
+func Load(file string) (Pinch, error) {
+	pinch := Pinch{}
+
 	// load up the config.
 	raw, err := ioutil.ReadFile(file)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"err": err}).Debug("Could not load the pinch file")
-		return nil, err
+		return pinch, err
 	}
 
-	pinch := &Pinch{}
-	err = yaml.Unmarshal([]byte(raw), pinch)
+	err = yaml.Unmarshal([]byte(raw), &pinch)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"err": err}).Debug("Could not parse pinch yaml")
-		return nil, err
+		return pinch, err
 	}
 
 	return pinch, nil

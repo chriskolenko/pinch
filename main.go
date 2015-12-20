@@ -8,7 +8,6 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/webcanvas/pinch/engine"
-	"github.com/webcanvas/pinch/pinchers"
 	"github.com/webcanvas/pinch/shared/environment"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -29,6 +28,8 @@ import (
 	_ "github.com/webcanvas/pinch/plugins/sonar"
 )
 
+var version string
+
 func errored(err error) {
 	fmt.Fprintf(os.Stderr, "error: %v\n", err)
 	os.Exit(1)
@@ -43,15 +44,8 @@ func pinch(c *cli.Context) {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
-	pinch, err := pinchers.Load(pinchfile)
-	if err != nil {
-		errored(err)
-		return
-	}
-
 	env := environment.Load(dotenv)
-
-	err = engine.Run(env, pinch)
+	err := engine.Run(env, pinchfile)
 	if err != nil {
 		errored(err)
 	}
@@ -60,8 +54,9 @@ func pinch(c *cli.Context) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "pinch"
+	app.Usage = "PINCHIE PINCHIE!!!!!!!!!!!!!"
+	app.Version = version
 	app.Action = pinch
-	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "debug, d",

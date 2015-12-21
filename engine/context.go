@@ -8,6 +8,11 @@ type Context struct {
 	Facts map[string]string
 }
 
+// AddFact adds a key and value to existing facts
+func (c Context) AddFact(key, val string) {
+	c.Facts[key] = val
+}
+
 // NewContext creates a new context
 func NewContext(env environment.Env) Context {
 	return Context{

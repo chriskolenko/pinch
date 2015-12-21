@@ -6,32 +6,24 @@ import "github.com/Sirupsen/logrus"
 type RuntimeVarMap map[string]RuntimeVar
 
 // Resolve a runtime map into a dictionary from many maps.
-func (dest RuntimeVarMap) Resolve(maps ...map[string]string) (map[string]string, error) {
+func (dest RuntimeVarMap) Resolve(vars map[string]string) (map[string]string, error) {
 	// create options.
 	opts := make(map[string]string)
+
+	// add these to the opts
+	for key, value := range vars {
+		opts[key] = value
+	}
+
+	// go through the runtime vars
 	for key, value := range dest {
-		var str string
-		var err error
-
-		rv := value
-
 		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Debug("The runtime key and value")
-		for _, m := range maps {
-			str, err = rv.String(m)
-			if err == nil {
-				break
-			}
 
-			rv = NewRuntimeVar(str)
-		}
-
-		// if the error is still not nil return
+		resolved, err := value.String(vars)
 		if err != nil {
 			return opts, err
 		}
-
-		// add the value to the opts
-		opts[key] = str
+		opts[key] = resolved
 	}
 
 	return opts, nil

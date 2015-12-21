@@ -16,8 +16,8 @@ type Pincher struct {
 }
 
 // Run will run the pinch
-func (p Pincher) Run(vars ...map[string]string) (models.Result, error) {
-	opts, err := p.runtimeVars.Resolve(vars...)
+func (p Pincher) Run(vars map[string]string) (models.Result, error) {
+	opts, err := p.runtimeVars.Resolve(vars)
 	if err != nil {
 		return models.Result{}, err
 	}

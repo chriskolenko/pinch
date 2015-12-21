@@ -4,6 +4,7 @@ language: go
 environment:
   - OUTPUT_DIR=".build/output"
   - GO15VENDOREXPERIMENT="1"
+  - VERSION="1.0.0"
 
 facts:
   - git: "action=longhash"
@@ -12,7 +13,7 @@ services:
   - mysql: "db=test login=test:test"
 
 pre:
-  - go: "action=build -ldflags='-X main.version=0.2.3'"
+  - go: "action=build ldflags='-X main.version=$$VERSION'"
 
 test:
   - go: "action=test"

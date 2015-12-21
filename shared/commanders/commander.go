@@ -4,6 +4,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"github.com/Sirupsen/logrus"
 )
 
 // Commander the way to execute commands
@@ -13,11 +15,10 @@ type Commander struct {
 
 // ExecOutput executes a command and returns the stdout as string
 func (c *Commander) ExecOutput(args ...string) ([]byte, error) {
-	out, err := exec.Command(c.Binary, args...).Output()
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	logrus.WithFields(logrus.Fields{"binary": c.Binary, "args": args}).Debug("Running ExecOutput")
+
+	out, err := exec.Command(c.Binary, args...).CombinedOutput()
+	return out, err
 }
 
 // Open returns a commander
@@ -31,7 +32,7 @@ func Open(binary string, directories ...string) (*Commander, error) {
 
 	p, err := exec.LookPath(binary)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &Commander{Binary: p}, nil

@@ -1,7 +1,9 @@
 package golang
 
 import (
+	"path/filepath"
 	"regexp"
+	"runtime"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
@@ -23,30 +25,16 @@ type buildOpts struct {
 	AppName   string
 }
 
+type testOpts struct {
+}
+
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *golang) Setup() error {
-	commander, err := commanders.Open("go")
-	if err != nil {
-		return err
-	}
-
-	// get the version
-	out, err := commander.ExecOutput("version")
-	if err != nil {
-		return err
-	}
-
-	vers := versionex.Find(out)
-	g.Version = string(vers)
-
-	g.commander = commander
-
-	logrus.WithFields(logrus.Fields{"Version": g.Version}).Debug("Git.Setup: Find version of git")
-	return nil
+func (g *golang) Setup(models.Raw) (result models.Result, err error) {
+	return
 }
 
 // Exec runs the pinch
-func (g *golang) Exec(data map[string]string) (models.Result, error) {
+func (g *golang) Exec(data models.Raw) (models.Result, error) {
 	// Default to shorthash if no action
 	action, ok := data["action"]
 	if !ok {
@@ -59,6 +47,10 @@ func (g *golang) Exec(data map[string]string) (models.Result, error) {
 		opts := buildOpts{}
 		mapstructure.Decode(data, &opts)
 		return g.build(opts)
+	case "test":
+		opts := testOpts{}
+		mapstructure.Decode(data, &opts)
+		return g.test(opts)
 	}
 
 	// get the output directory if supplied or use our default one.
@@ -76,11 +68,12 @@ func (g golang) build(opts buildOpts) (models.Result, error) {
 		outputdir = ".build"
 	}
 
-	if appname == "" {
-		appname = ""
+	if runtime.GOOS == "windows" {
+		appname = appname + ".exe"
 	}
 
-	args := []string{"build"}
+	output := filepath.Join(outputdir, appname)
+	args := []string{"build", "-o", output}
 
 	if ldflags != "" {
 		// add the ldflags option.
@@ -89,13 +82,29 @@ func (g golang) build(opts buildOpts) (models.Result, error) {
 	}
 
 	// Now run it.
-	output, err := g.commander.ExecOutput(args...)
+	o, err := g.commander.ExecOutput(args...)
 	if err != nil {
 		// What's the error?
-		logrus.WithFields(logrus.Fields{"output": string(output), "err": err}).Debug("What's the output?")
+		logrus.WithFields(logrus.Fields{"output": string(o), "err": err}).Debug("What's the output?")
 	}
-	logrus.Debug(string(output))
+	logrus.Debug(string(o))
 
+	// TODO check the result.
+	return models.Result{}, err
+}
+
+func (g golang) test(opts testOpts) (models.Result, error) {
+	args := []string{"test", "./..."}
+
+	// Now run it.
+	o, err := g.commander.ExecOutput(args...)
+	if err != nil {
+		// What's the error?
+		logrus.WithFields(logrus.Fields{"output": string(o), "err": err}).Debug("What's the output?")
+	}
+	logrus.Debug(string(o))
+
+	// TODO check the result.
 	return models.Result{}, err
 }
 

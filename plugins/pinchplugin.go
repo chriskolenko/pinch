@@ -14,8 +14,8 @@ var (
 
 // PinchPlugin default interface for a pinch pinch plugin
 type PinchPlugin interface {
-	Setup() error
-	Exec(map[string]string) (models.Result, error)
+	Setup(models.Raw) (models.Result, error)
+	Exec(models.Raw) (models.Result, error)
 }
 
 // RegisterPinchPlugin allows external packages to register a pinch pinch plugin
@@ -34,8 +34,8 @@ func RegisterPinchPlugin(name string, plugin PinchPlugin) {
 	pinchPlugins[name] = plugin
 }
 
-// SetupPinchPlugin finds a pinch plugin and returns it
-func SetupPinchPlugin(name string) (PinchPlugin, error) {
+// LoadPinchPlugin finds a pinch plugin and returns it
+func LoadPinchPlugin(name string) (PinchPlugin, error) {
 	// get the plugin
 	pinchPluginMu.Lock()
 	plugin, ok := pinchPlugins[name]
@@ -45,6 +45,5 @@ func SetupPinchPlugin(name string) (PinchPlugin, error) {
 		return nil, fmt.Errorf("SetupPinchPlugin: unknown plugin %q (forgotten import?)", name)
 	}
 
-	err := plugin.Setup()
-	return plugin, err
+	return plugin, nil
 }

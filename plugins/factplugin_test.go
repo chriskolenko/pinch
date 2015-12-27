@@ -5,9 +5,9 @@ import (
 )
 
 func TestFactPlugin(t *testing.T) {
-	plugin, err := SetupFactPlugin("test")
+	plugin, err := LoadFactPlugin("test")
 	if err != nil {
-		t.Fatalf("SetupFactPlugin: %v", err)
+		t.Fatalf("LoadFactPlugin: %v", err)
 	}
 
 	if plugin == nil {

@@ -14,8 +14,8 @@ var (
 
 // FactPlugin default interface for a pinch fact plugin
 type FactPlugin interface {
-	Setup() error
-	Gather(map[string]string) (models.Result, error)
+	Setup(models.Raw) (models.Result, error)
+	Gather(models.Raw) (models.Result, error)
 }
 
 // RegisterFactPlugin allows external packages to register a pinch fact plugin
@@ -34,8 +34,8 @@ func RegisterFactPlugin(name string, plugin FactPlugin) {
 	factPlugins[name] = plugin
 }
 
-// SetupFactPlugin finds a fact plugin and returns it
-func SetupFactPlugin(name string) (FactPlugin, error) {
+// LoadFactPlugin finds a fact plugin and returns it
+func LoadFactPlugin(name string) (FactPlugin, error) {
 	// get the plugin
 	factPluginMu.Lock()
 	plugin, ok := factPlugins[name]
@@ -45,6 +45,5 @@ func SetupFactPlugin(name string) (FactPlugin, error) {
 		return nil, fmt.Errorf("SetupFactPlugin: unknown plugin %q (forgotten import?)", name)
 	}
 
-	err := plugin.Setup()
-	return plugin, err
+	return plugin, nil
 }

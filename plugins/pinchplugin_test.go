@@ -5,7 +5,7 @@ import (
 )
 
 func TestPinchPlugin(t *testing.T) {
-	plugin, err := SetupPinchPlugin("test")
+	plugin, err := LoadPinchPlugin("test")
 	if err != nil {
 		t.Fatalf("SetupPinchPlugin: %v", err)
 	}

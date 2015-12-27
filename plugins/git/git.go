@@ -24,16 +24,16 @@ type Git struct {
 }
 
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *Git) Setup() error {
+func (g *Git) Setup(models.Raw) (result models.Result, err error) {
 	commander, err := commanders.Open("git")
 	if err != nil {
-		return err
+		return
 	}
 
 	// get the version
 	out, err := commander.ExecOutput("version")
 	if err != nil {
-		return err
+		return
 	}
 
 	vers := versionex.Find(out)
@@ -42,11 +42,11 @@ func (g *Git) Setup() error {
 	g.commander = commander
 
 	logrus.WithFields(logrus.Fields{"Version": g.Version}).Debug("Git.Setup: Find version of git")
-	return nil
+	return
 }
 
 // Gather return facts for git based on options
-func (g *Git) Gather(data map[string]string) (models.Result, error) {
+func (g *Git) Gather(data models.Raw) (models.Result, error) {
 	// get the version of git.
 	opts := &FactOpts{}
 	mapstructure.Decode(data, &opts)

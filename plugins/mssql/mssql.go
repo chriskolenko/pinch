@@ -52,12 +52,12 @@ func (opts *serviceopts) MsSQLConnString() string {
 }
 
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *mssql) Setup() error {
-	return nil
+func (g *mssql) Setup(models.Raw) (result models.Result, err error) {
+	return
 }
 
 // Ensure setups the service
-func (g *mssql) Ensure(data map[string]string) (result models.Result, err error) {
+func (g *mssql) Ensure(data models.Raw) (result models.Result, err error) {
 	opts := new(serviceopts)
 	mapstructure.Decode(data, &opts)
 

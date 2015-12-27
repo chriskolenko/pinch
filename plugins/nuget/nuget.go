@@ -20,31 +20,30 @@ type nuget struct {
 }
 
 // Setup initializes the NuGet plugin
-func (n *nuget) Setup() error {
-
+func (n *nuget) Setup(models.Raw) (result models.Result, err error) {
 	cmd, err := commanders.Open("nuget.exe", "./", "./.nuget")
 	if err != nil {
-		return err
+		return
 	}
 
 	output, err := cmd.ExecOutput()
 	if err != nil {
-		return err
+		return
 	}
 
 	version, err := getVersion(output)
 	if err != nil {
-		return err
+		return
 	}
 
 	n.Version = version
 	n.commander = cmd
 
-	return nil
+	return
 }
 
 // Exec runs the pinch
-func (n *nuget) Exec(opts map[string]string) (models.Result, error) {
+func (n *nuget) Exec(opts models.Raw) (models.Result, error) {
 	return models.Result{}, nil
 }
 

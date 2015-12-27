@@ -5,7 +5,7 @@ import (
 )
 
 func TestServicePlugin(t *testing.T) {
-	plugin, err := SetupServicePlugin("test")
+	plugin, err := LoadServicePlugin("test")
 	if err != nil {
 		t.Fatalf("SetupServicePlugin: %v", err)
 	}

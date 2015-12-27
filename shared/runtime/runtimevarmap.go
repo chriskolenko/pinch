@@ -1,12 +1,12 @@
-package pinchers
+package runtime
 
 import "github.com/Sirupsen/logrus"
 
-// RuntimeVarMap used to make it pretty
-type RuntimeVarMap map[string]RuntimeVar
+// VarMap used to make it pretty
+type VarMap map[string]Var
 
 // Resolve a runtime map into a dictionary from many maps.
-func (dest RuntimeVarMap) Resolve(vars map[string]string) (map[string]string, error) {
+func (dest VarMap) Resolve(vars map[string]string) (map[string]string, error) {
 	// create options.
 	opts := make(map[string]string)
 
@@ -29,12 +29,13 @@ func (dest RuntimeVarMap) Resolve(vars map[string]string) (map[string]string, er
 	return opts, nil
 }
 
-// Fill parses a string and adds them to a map
-func (dest RuntimeVarMap) Fill(str string) {
+// Parse parses a string and adds them to a map of runtime vars
+func Parse(str string) VarMap {
 	var groupingch *rune
 	iskey := true
 	key := ""
 	value := ""
+	dest := make(VarMap)
 
 	for _, ch := range str {
 		switch {
@@ -60,7 +61,7 @@ func (dest RuntimeVarMap) Fill(str string) {
 		case ch == ' ':
 			if groupingch == nil {
 				if key != "" {
-					dest[key] = NewRuntimeVar(value)
+					dest[key] = NewVar(value)
 					key = ""
 					value = ""
 					iskey = true
@@ -78,6 +79,8 @@ func (dest RuntimeVarMap) Fill(str string) {
 	}
 
 	if key != "" {
-		dest[key] = NewRuntimeVar(value)
+		dest[key] = NewVar(value)
 	}
+
+	return dest
 }

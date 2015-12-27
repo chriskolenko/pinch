@@ -1,4 +1,4 @@
-package pinchers
+package runtime
 
 import (
 	"errors"
@@ -13,14 +13,14 @@ var runtimeregexp = regexp.MustCompile(`\$\$([a-zA-Z0-9_]+)`)
 // ErrMissingRuntimeVal is the error that occurs when the runtime variable cannot replace placeholders
 var ErrMissingRuntimeVal = errors.New("Missing value")
 
-// RuntimeVar holds a string and allows replacing of placeholders ie $$something
-type RuntimeVar struct {
+// Var holds a string and allows replacing of placeholders ie $$something
+type Var struct {
 	raw      string
 	replaces []string
 }
 
 // String returns a string that has replaced all the placeholders
-func (r *RuntimeVar) String(vars map[string]string) (string, error) {
+func (r Var) String(vars map[string]string) (string, error) {
 	str := r.raw
 
 	if len(r.replaces) == 0 {
@@ -46,10 +46,10 @@ func (r *RuntimeVar) String(vars map[string]string) (string, error) {
 	return str, err
 }
 
-// NewRuntimeVar returns a new runtimevar
-func NewRuntimeVar(raw string) RuntimeVar {
+// NewVar returns a new runtime variable
+func NewVar(raw string) Var {
 	replaces := runtimeregexp.FindAllString(raw, -1)
-	return RuntimeVar{
+	return Var{
 		raw:      raw,
 		replaces: replaces,
 	}

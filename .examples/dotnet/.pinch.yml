@@ -12,7 +12,7 @@ environment:
 # - nuget: "name=something"
 
 services:
-  - mssql: ""
+  - mssql
   # - iisexpress: "localhost:3333"
   # - iis: "localhost/something"
 

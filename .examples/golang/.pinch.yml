@@ -10,7 +10,7 @@ facts:
   - git: "action=longhash"
 
 services:
-  - mysql: "db=test login=test:test"
+  - mysql
 
 pre:
   - go: "action=build ldflags='-X main.version=$$VERSION'"

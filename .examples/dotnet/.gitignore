@@ -1,0 +1,14 @@
+*.DS_Store
+[Tt]humbs.db
+
+[Bb]in
+[Oo]bj
+
+*.suo
+*.user
+*.vs
+
+[Pp]ackages
+**/.build/output
+
+temp/

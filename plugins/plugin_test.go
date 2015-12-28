@@ -4,10 +4,10 @@ import (
 	"testing"
 )
 
-func TestFactPlugin(t *testing.T) {
-	plugin, err := LoadFactPlugin("test")
+func TestPlugin(t *testing.T) {
+	plugin, err := LoadPlugin("test")
 	if err != nil {
-		t.Fatalf("LoadFactPlugin: %v", err)
+		t.Fatalf("LoadPlugin: %v", err)
 	}
 
 	if plugin == nil {

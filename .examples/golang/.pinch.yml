@@ -12,7 +12,7 @@ facts:
 services:
   - mysql
 
-pre:
+build:
   - go: "action=build ldflags='-X main.version=$$VERSION'"
 
 test:

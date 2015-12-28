@@ -2,23 +2,22 @@
 language: .net
 
 environment:
-- DB="dbconnenctionstring"
-- MY="something_here"
-- ARTIFACTORY_URL="hi"
 - CONFIGURATION="release"
 - OUTPUT_DIR=".build/output"
 
-# facts:
-# - nuget: "name=something"
+facts:
+  - git: "action=longhash"
 
 services:
   - mssql
   # - iisexpress: "localhost:3333"
   # - iis: "localhost/something"
 
-pre:
+setup:
   - nuget: "action=restore"
   - gitversion: "updateassemblyinfo=true"
+
+build:
   - msbuild: "path=*.sln targets=clean,build recurse=true"
 
 test:

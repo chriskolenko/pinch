@@ -9,8 +9,8 @@ import (
 type print struct{}
 
 // Setup initializes the NuGet plugin
-func (n *print) Setup(models.Raw) (result models.Result, err error) {
-	return
+func (n *print) Setup(models.PluginType, models.Raw) (interface{}, error) {
+	return n, nil
 }
 
 // Gather gathers all the facts for a pinch
@@ -32,8 +32,5 @@ func (n *print) Exec(opts models.Raw) (models.Result, error) {
 }
 
 func init() {
-	p := &print{}
-	plugins.RegisterFactPlugin("print", p)
-	// plugins.RegisterServicePlugin("print", p)
-	plugins.RegisterPinchPlugin("print", p)
+	plugins.RegisterPlugin("print", &print{})
 }

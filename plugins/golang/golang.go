@@ -29,8 +29,8 @@ type testOpts struct {
 }
 
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *golang) Setup(models.Raw) (result models.Result, err error) {
-	return
+func (g *golang) Setup(models.PluginType, models.Raw) (interface{}, error) {
+	return nil, nil
 }
 
 // Exec runs the pinch
@@ -110,5 +110,5 @@ func (g golang) test(opts testOpts) (models.Result, error) {
 
 func init() {
 	g := &golang{}
-	plugins.RegisterPinchPlugin("go", g)
+	plugins.RegisterPlugin("go", g)
 }

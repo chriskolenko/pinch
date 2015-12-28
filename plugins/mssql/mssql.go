@@ -1,12 +1,9 @@
 package mssql
 
 import (
-	"database/sql"
-	"fmt"
+	"errors"
 	"regexp"
-	"strings"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
 	"github.com/webcanvas/pinch/plugins"
 	"github.com/webcanvas/pinch/shared/commanders"
@@ -14,85 +11,28 @@ import (
 )
 
 var versionex = regexp.MustCompile("[0-9.]+")
+var errNotSupported = errors.New("Not supported")
 
 type mssql struct {
 	commander *commanders.Commander
 	Version   string
 }
 
-type serviceopts struct {
-	Server   string
-	Port     int
-	UserID   string
-	Password string
-	Database string
-}
-
-func (opts *serviceopts) MsSQLConnString() string {
-	args := []string{}
-
-	server := opts.Server
-	port := opts.Port
-	userid := opts.UserID
-	password := opts.Password
-
-	if server == "" {
-		server = "127.0.0.1\\SQLExpress"
-	}
-	if port == 0 {
-		port = 1433
-	}
-
-	args = append(args, fmt.Sprintf("server=%s", server))
-	args = append(args, fmt.Sprintf("port=%d", port))
-	args = append(args, fmt.Sprintf("user id=%s", userid))
-	args = append(args, fmt.Sprintf("password=%s", password))
-
-	return strings.Join(args, ";")
-}
-
 // Setup runs all the pre plugin stuff. IE finding versions
-func (g *mssql) Setup(models.Raw) (result models.Result, err error) {
-	return
-}
+func (g *mssql) Setup(pluginType models.PluginType, data models.Raw) (interface{}, error) {
+	// we only support running this as a service.
+	if pluginType != models.ServicePluginType {
+		return nil, errNotSupported
+	}
 
-// Ensure setups the service
-func (g *mssql) Ensure(data models.Raw) (result models.Result, err error) {
-	opts := new(serviceopts)
+	// get the options for the plugin.
+	opts := Options{}
 	mapstructure.Decode(data, &opts)
 
-	connstr := opts.MsSQLConnString()
-	logrus.WithFields(logrus.Fields{"connstr": connstr}).Debug("What's the connection?")
-
-	db, err := sql.Open("mssql", connstr)
-	if err != nil {
-		return
-	}
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		return
-	}
-
-	var version string
-	err = db.QueryRow("SELECT @@VERSION as version").Scan(&version)
-	if err != nil {
-		return
-	}
-
-	logrus.WithFields(logrus.Fields{"version": version, "database": opts.Database}).Debug("We have a version of mssql")
-
-	// TODO drop database
-	// TODO create database
-	// TODO create local user accounts
-
-	// TODO return service information
-
-	return
+	return CreateRunner(opts)
 }
 
 func init() {
 	g := &mssql{}
-	plugins.RegisterServicePlugin("mssql", g)
+	plugins.RegisterPlugin("mssql", g)
 }

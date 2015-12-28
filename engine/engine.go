@@ -2,11 +2,15 @@ package engine
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/webcanvas/pinch/pinchers"
+	"github.com/webcanvas/pinch/plugins"
 	"github.com/webcanvas/pinch/shared/environment"
+	"github.com/webcanvas/pinch/shared/models"
+	"github.com/webcanvas/pinch/shared/runtime"
 )
 
 // ErrNoPinch no parsed pinch file err
@@ -56,7 +60,7 @@ func run(ctx Context, pinchfile string) error {
 		}
 	}
 
-	for key, value := range pinch.Environment.Variables {
+	for key, value := range pinch.Environment {
 		v, err := value.String(ctx.Env)
 		if err != nil {
 			return err
@@ -67,67 +71,144 @@ func run(ctx Context, pinchfile string) error {
 	}
 
 	logrus.Debug("Whats the environment vars?", pinch.Environment)
+	logrus.Debug("Whats the services?", pinch.Services)
 
 	// foreach fact run.
-	for _, pincher := range pinch.Facts {
-		err = handle(ctx, pincher)
+	for _, item := range pinch.Facts {
+		fact, err := loadPlugin(ctx, models.FactPluginType, item)
 		if err != nil {
 			return err
 		}
+
+		result, err := fact.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
 	}
 
-	for _, pincher := range pinch.Services {
-		err = handle(ctx, pincher)
+	for _, item := range pinch.Services {
+		service, err := loadPlugin(ctx, models.ServicePluginType, item)
 		if err != nil {
 			return err
 		}
+
+		result, err := service.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
 	}
 
-	for _, pincher := range pinch.Pre {
-		err = handle(ctx, pincher)
+	for _, item := range pinch.Setup {
+		setup, err := loadPlugin(ctx, models.SetupPluginType, item)
 		if err != nil {
 			return err
 		}
+
+		result, err := setup.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
 	}
 
-	for _, pincher := range pinch.Tests {
-		err = handle(ctx, pincher)
+	for _, item := range pinch.Build {
+		build, err := loadPlugin(ctx, models.BuildPluginType, item)
 		if err != nil {
 			return err
 		}
+
+		result, err := build.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
 	}
 
-	for _, pincher := range pinch.Post {
-		err = handle(ctx, pincher)
+	for _, item := range pinch.Test {
+		test, err := loadPlugin(ctx, models.TestPluginType, item)
 		if err != nil {
 			return err
 		}
+
+		result, err := test.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
+	}
+
+	for _, item := range pinch.Post {
+		post, err := loadPlugin(ctx, models.PostPluginType, item)
+		if err != nil {
+			return err
+		}
+
+		result, err := post.Run()
+		if err != nil {
+			return err
+		}
+
+		ctx.AddResult(result)
 	}
 
 	return nil
 }
 
-func handle(ctx Context, runner Runner) error {
-	// run the setup first
-	r1, err := runner.Setup(ctx.Facts)
-	if err != nil {
-		return err
+func loadPlugin(ctx Context, typ models.PluginType, pluginDetails map[string]runtime.VarMap) (Runner, error) {
+	if pluginDetails == nil {
+		return nil, fmt.Errorf("No plugin defined")
 	}
 
-	// add the result back to the context
-	ctx.AddResult(r1)
+	wrapped := new(wrapped)
 
-	// TODO Maybe we should think about errors!.
+	for key, val := range pluginDetails {
+		// TODO support adapters!.
 
-	r2, err := runner.Run(ctx.Facts)
-	if err != nil {
-		return err
+		// load the plugin
+		plugin, err := plugins.GetPlugin(key)
+		if err != nil {
+			return nil, err
+		}
+
+		// create the options for the plugin
+		opts, err := val.Resolve(ctx.Facts)
+		if err != nil {
+			return nil, err
+		}
+
+		// setup the plugin.
+		loaded, err := plugin.Setup(typ, opts)
+		if err != nil {
+			return nil, err
+		}
+
+		// This could cause a panic!.
+		runner, ok := loaded.(Runner)
+		if !ok {
+			return nil, fmt.Errorf("Plugin not supported for type: %s, %v", key, typ)
+		}
+
+		wrapped.inner = runner
 	}
 
-	// add the result back to the context
-	ctx.AddResult(r2)
+	return wrapped, nil
+}
 
-	// TODO Maybe we should think about errors!.
+type wrapped struct {
+	inner Runner
+}
 
-	return nil
+func (w *wrapped) Run() (models.Result, error) {
+	if w.inner == nil {
+		return models.Result{}, fmt.Errorf("We don't have anything to run, the plugin wasn't created correctly")
+	}
+
+	return w.inner.Run()
 }

@@ -3,7 +3,7 @@ package commanders
 import (
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -24,7 +24,7 @@ func (c *Commander) ExecOutput(args ...string) ([]byte, error) {
 // Open returns a commander
 func Open(binary string, directories ...string) (*Commander, error) {
 	for _, dir := range directories {
-		p := path.Join(dir, binary)
+		p := filepath.Join(dir, binary)
 		if _, err := os.Stat(p); err == nil {
 			return &Commander{Binary: p}, nil
 		}

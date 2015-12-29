@@ -2,8 +2,8 @@
 language: .net
 
 environment:
-- CONFIGURATION="release"
-- OUTPUT_DIR=".build/output"
+- CONFIGURATION="Release"
+- OUTPUT_DIR=".build\output"
 
 facts:
   - git: "action=longhash"
@@ -18,7 +18,7 @@ setup:
   - gitversion: "updateassemblyinfo=true"
 
 build:
-  - msbuild: "path=*.sln targets=clean,build recurse=true"
+  - msbuild: "path=*.sln targets=Clean,Build recurse=true"
 
 test:
   - liquibase: "action=upgrade contexts=dll,test,something url=$$ARTIFACTORY_URL/$$MY/$$DB"

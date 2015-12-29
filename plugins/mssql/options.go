@@ -24,7 +24,7 @@ func (opts *Options) MsSQLConnString() string {
 	password := opts.Password
 
 	if server == "" {
-		server = "127.0.0.1\\SQLExpress"
+		server = `127.0.0.1\SQLExpress`
 	}
 	if port == 0 {
 		port = 1433

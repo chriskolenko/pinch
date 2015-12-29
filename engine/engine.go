@@ -34,7 +34,7 @@ func Run(env environment.Env, pinchfile string) error {
 	ctx := NewContext(env)
 
 	// add the directory as the working directory
-	ctx.AddFact("PWD", dir)
+	ctx.AddFact("WD", dir)
 
 	// add the folder name as the appname
 	ctx.AddFact("AppName", info.Name())

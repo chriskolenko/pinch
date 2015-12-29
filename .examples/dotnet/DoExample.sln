@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{69BF28
 		.pinch.yml = .pinch.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoExample.Core.AcceptanceTests", "Tests\DoExample.Core.AcceptanceTests\DoExample.Core.AcceptanceTests.csproj", "{6795C3CF-6BA1-4593-90F6-61F18C89BE91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{ACC90B82-56A5-486B-A8EB-14645BE667EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACC90B82-56A5-486B-A8EB-14645BE667EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACC90B82-56A5-486B-A8EB-14645BE667EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6795C3CF-6BA1-4593-90F6-61F18C89BE91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6795C3CF-6BA1-4593-90F6-61F18C89BE91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6795C3CF-6BA1-4593-90F6-61F18C89BE91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6795C3CF-6BA1-4593-90F6-61F18C89BE91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

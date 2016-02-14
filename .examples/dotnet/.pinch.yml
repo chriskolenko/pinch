@@ -4,6 +4,7 @@ language: .net
 environment:
 - CONFIGURATION="Release"
 - OUTPUT_DIR=".build\output"
+- TEMP_DIR="obj"
 
 facts:
   - git: "action=longhash"
@@ -18,12 +19,12 @@ setup:
   - gitversion: "updateassemblyinfo=true"
 
 build:
-  - msbuild: "path=*.sln targets=Clean,Build recurse=true"
+  - msbuild: "path=*.sln targets=Clean,Build"
 
 test:
-  - liquibase: "action=upgrade contexts=dll,test,something url=$$ARTIFACTORY_URL/$$MY/$$DB"
-  - liquibase: "action=upgrade contexts=dll,test,something path=db"
-  - host: "path=*app*.nupkg"
+  # - liquibase: "action=upgrade contexts=dll,test,something url=$$ARTIFACTORY_URL/$$MY/$$DB"
+  # - liquibase: "action=upgrade contexts=dll,test,something path=db"
+  # - host: "path=*app*.nupkg"
   - nunit: "files=*Tests*.dll recurse=true"
 
 post:

@@ -10,7 +10,7 @@ namespace DoExample.Core
     public class CoreConfig
     {
         public String DB { get; set; }
-        public String DBDriver { get; set; }
+        public String DBDriver { get; set; }∫
 
         public static CoreConfig Load()
         {

@@ -4,6 +4,8 @@ package msbuild
 type Options struct {
 	WorkingDirectory string `mapstructure:"WD"`
 	OutputDirectory  string `mapstructure:"Output_Dir"`
+	TestsDirectory   string `mapstructure:"Tests_Dir"`
+	TempDirectory    string `mapstructure:"Temp_Dir"`
 	Configuration    string
 	Platform         string
 	Is32Bit          bool

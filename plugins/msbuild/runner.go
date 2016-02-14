@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/webcanvas/pinch/shared/commanders"
 	"github.com/webcanvas/pinch/shared/models"
@@ -15,58 +14,68 @@ import (
 
 // Runner holds information for the Run method
 type Runner struct {
-	OutputDirectory string
-	Configuration   string
-	Targets         []string
-	Platform        string
-	ProjectFiles    []string
+	// Configs has the information about the different msbuild configurations and platforms
+	Configs []BuildConfig
+	// Targets are the different targets passed to msbuild, build and rebuild have post build operations
+	Targets []BuildTarget
+	// Projects can be full paths to sln or csproj files
+	Projects []BuildProject
+	// DefaultProjects has a list of csproj names, each csprojs artifacts will be copied to the output directory
+	DefaultProjects []string
+	// NuGetVersion if octopack is installed this will pass in the nuget package version
+	NuGetVersion string
 
 	cmd commanders.Commander
 }
 
-func (r Runner) ensureDirectories() error {
-	return ensureDirectory(r.OutputDirectory)
-}
+func (r Runner) run(project BuildProject, config BuildConfig, target BuildTarget) error {
+	tempDir := filepath.Join(config.TempDirectory, "Pinch-"+config.Configuration)
+	binDir := filepath.Join(tempDir, "bin")
 
-func (r Runner) runMSBuild(projectFile, target string) error {
-	// what should the output be?
-	outputDir := `obj\pinch-` + r.Configuration
-
-	// make the args
 	args := []string{
-		projectFile,
-		"/t:" + target,
-		"/p:Configuration=" + r.Configuration,
-		"/p:Platform=" + r.Platform,
-		"/p:WebProjectOutputDir=" + outputDir,
-		"/p:OutDir=" + outputDir,
-		// "/p:OutputPath=" + outputDir,
-		"/m",
-		"/v:quiet",
-		"/nologo",
+		project.Path,
+		fmt.Sprintf(`/t:%s`, target.Target),
+		fmt.Sprintf(`/p:Configuration=%s`, config.Configuration),
+		fmt.Sprintf(`/p:Platform=%s`, config.Platform),
+		fmt.Sprintf(`/p:WebProjectOutputDir=%s`, binDir),
+		fmt.Sprintf(`/p:OutDir=%s`, tempDir),
+		fmt.Sprintf(`/p:OctoPackPublishPackageToFileShare=%s`, config.OutputDirectory),
+		fmt.Sprintf(`/p:OctoPackPackageVersion=%s`, r.NuGetVersion),
+		`/p:RunOctoPack=true`,
+		`/m`,
+		`/v:quiet`,
+		`/nologo`,
 	}
 
 	output, err := r.cmd.ExecOutput(args...)
 	if err != nil {
+		fmt.Print(string(output))
 		return err
 	}
 
+	if !target.PostBuild {
+		return nil
+	}
+
 	// find all the test directories.
-	dir := filepath.Dir(projectFile)
+	dir := filepath.Dir(project.Path)
 	testProjects, err := getTestProjects(dir)
 	if err != nil {
 		return err
 	}
 
 	// create the path.
-	allTestsOutput := filepath.Join(r.OutputDirectory, "Tests")
-	err = os.RemoveAll(allTestsOutput)
+	err = os.RemoveAll(config.TestsDirectory)
 	if err != nil {
 		return err
 	}
 
+	// # Artifact default project
+	// $project_build_output_dir = $(Join-Path "$default_project_dir" "$output_dir_name")
+	// Copy-Item "$project_build_output_dir" "$artifact_dir" -Recurse -Force
+
 	// create the test directory.
-	err = ensureDirectory(allTestsOutput)
+	err = ensureDirectory(config.TestsDirectory)
 	if err != nil {
 		return err
 	}
@@ -83,14 +92,18 @@ func (r Runner) runMSBuild(projectFile, target string) error {
 		extension := filepath.Ext(filename)
 		name := filename[0 : len(filename)-len(extension)]
 
-		testOutput := filepath.Join(allTestsOutput, name)
+		testOutput := filepath.Join(config.TestsDirectory, name)
 
-		testDir := filepath.Join(filepath.Dir(testProject), outputDir)
+		testDir := filepath.Join(filepath.Dir(testProject), tempDir)
 		err = copyDir(testDir, testOutput)
 		if err != nil {
 			return err
 		}
 	}
+
+	// # Artifact default project
+	// $project_build_output_dir = $(Join-Path "$default_project_dir" "$output_dir_name")
+	// Copy-Item "$project_build_output_dir" "$artifact_dir" -Recurse -Force
 
 	// # Artifact tests
 	// 	$test_projects = Get-TestProjectsFromSolution
@@ -101,7 +114,6 @@ func (r Runner) runMSBuild(projectFile, target string) error {
 	// }
 
 	// write the output.
-	fmt.Print(string(output))
 	return nil
 }
 
@@ -109,24 +121,16 @@ func (r Runner) runMSBuild(projectFile, target string) error {
 func (r *Runner) Run() (models.Result, error) {
 	result := models.Result{}
 
-	err := r.ensureDirectories()
-	if err != nil {
-		return result, err
-	}
-
-	// /p:RunOctoPack=$run_octopack /p:OctoPackPublishPackageToFileShare="$build_output_dir" /p:OctoPackPackageVersion=$version /verbosity:quiet }
-	// /p:WebProjectOutputDir="$output_dir_name" /p:OutDir="$(Join-Path "$output_dir_name" "bin\")" /p:RunOctoPack=$run_octopack /p:OctoPackPublishPackageToFileShare="$build_output_dir" /p:OctoPackPackageVersion="$nuget_version" /verbosity:quiet }
-
-	for _, project := range r.ProjectFiles {
-
-		// get information about the msbuild solution!.
-
-		// run msbuild!.
-		for _, target := range r.Targets {
-			// this doesn't take in account the result yet.
-			err := r.runMSBuild(project, target)
-			if err != nil {
-				return result, err
+	for _, project := range r.Projects {
+		// maybe todo get information about the msbuild solution!.
+		for _, buildconfig := range r.Configs {
+			// run msbuild!.
+			for _, target := range r.Targets {
+				// this doesn't take in account the result yet.
+				err := r.run(project, buildconfig, target)
+				if err != nil {
+					return result, err
+				}
 			}
 		}
 	}
@@ -136,8 +140,6 @@ func (r *Runner) Run() (models.Result, error) {
 
 // CreateRunner creates the object which will run the msbuild operations
 func CreateRunner(versions Versions, opts Options) (*Runner, error) {
-	// try to find the msbuild !.
-
 	// get the tools version
 	version, err := versions.GetVersion(opts.ToolsVersion)
 	if err != nil {
@@ -155,53 +157,25 @@ func CreateRunner(versions Versions, opts Options) (*Runner, error) {
 		return nil, err
 	}
 
-	// get the targets.
-	target := strings.Replace(opts.Targets, " ", "", -1)
+	// create the targets
+	targets := NewBuildTargets(version.Version, opts.Targets)
 
-	var targets []string
-	if target == "" {
-		targets = []string{"Clean", "Build"}
-	} else if version.Version == "14.0" {
-		targets = []string{target}
-	} else {
-		targets = strings.Split(target, ",")
-	}
+	// create the configs
+	configs := NewBuildConfigs(opts.WorkingDirectory, opts.OutputDirectory, opts.TestsDirectory, opts.TempDirectory, opts.Configuration, opts.Platform)
 
-	// get the configuration.
-	configuration := opts.Configuration
-	if configuration == "" {
-		configuration = "Release"
-	}
-
-	platform := opts.Platform
-	if platform == "" {
-		platform = "Any Cpu"
-	}
-
-	// what about the output directory
-	outputDir := opts.OutputDirectory
-	if outputDir == "" {
-		outputDir = `.build\output`
-	}
-
-	// Convert output directory to full path.
-	if !filepath.IsAbs(outputDir) {
-		outputDir = filepath.Join(opts.WorkingDirectory, outputDir)
-	}
-
-	// get all the solutions or projects
-	projectPath := filepath.Join(opts.WorkingDirectory, opts.Path)
-	projectFiles, err := filepath.Glob(projectPath)
+	// finds all projects
+	projects, err := NewBuildProjects(opts.WorkingDirectory, opts.Path)
 	if err != nil {
 		return nil, err
 	}
 
+	defaultProject := []string{"something"}
+
 	return &Runner{
-		OutputDirectory: outputDir,
-		Configuration:   configuration,
+		Configs:         configs,
 		Targets:         targets,
-		Platform:        platform,
-		ProjectFiles:    projectFiles,
+		Projects:        projects,
+		DefaultProjects: defaultProject,
 
 		cmd: *cmd,
 	}, nil

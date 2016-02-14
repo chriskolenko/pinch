@@ -10,9 +10,6 @@ import (
 
 	"github.com/mitchellh/cli"
 	"github.com/webcanvas/pinch/ui"
-
-	_ "github.com/webcanvas/pinch/modules/docker"
-	_ "github.com/webcanvas/pinch/modules/msbuild"
 )
 
 var version string

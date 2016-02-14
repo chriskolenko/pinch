@@ -1,7 +1,8 @@
 package server
 
 type Config struct {
-	Addrs []Addr
+	Logging bool
+	Version string
 }
 
 type Server struct {
@@ -14,10 +15,16 @@ type Addr struct {
 	Addr  string
 }
 
-func New(cfg *Config) (*Server, error) {
-	s := &Server{
+func New(cfg *Config) *Server {
+	return &Server{
 		cfg: cfg,
 	}
+}
 
-	return s, nil
+func (s *Server) Wait(waitChan chan error) {
+	waitChan <- nil
+}
+
+func (s *Server) Close() {
+
 }

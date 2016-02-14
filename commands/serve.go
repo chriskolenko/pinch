@@ -5,9 +5,18 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/docker/docker/pkg/signal"
+	"github.com/webcanvas/pinch/api/server"
 	"github.com/webcanvas/pinch/capabilities"
 	"github.com/webcanvas/pinch/ui"
+
+	_ "github.com/webcanvas/pinch/modules/docker"
+	_ "github.com/webcanvas/pinch/modules/git"
+	_ "github.com/webcanvas/pinch/modules/msbuild"
 )
+
+const RFC3339NanoFixed = "2006-01-02T15:04:05.000000000Z07:00"
 
 type Serve struct {
 	ui.Ui
@@ -23,14 +32,10 @@ func (c Serve) Run(args []string) int {
 		return 1
 	}
 
-	// args = flags.Args()
-	// if len(args) != 1 {
-	// 	flags.Usage()
-	// 	return 1
-	// }
-
-	// create a new server
-	// srv := server.New()
+	logrus.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: RFC3339NanoFixed,
+		DisableColors:   false,
+	})
 
 	// load up the capabilities.
 	caps, err := capabilities.Load()
@@ -41,25 +46,38 @@ func (c Serve) Run(args []string) int {
 
 	fmt.Println(caps)
 
-	// TODO start the server.
+	cfg := &server.Config{
+		Logging: cfgDebug,
+		Version: "11.33.22",
+	}
+
+	// create a new server
+	api := server.New(cfg)
+
+	logrus.Info("Daemon has completed initialization")
+
+	// The serve API routine never exits unless an error occurs
+	// We need to start it as a goroutine and wait on it so
+	// daemon doesn't exit
+	serveAPIWait := make(chan error)
+	go api.Wait(serveAPIWait)
+
+	signal.Trap(func() {
+		api.Close()
+		<-serveAPIWait
+		// shutdownDaemon(d, 15)
+	})
 
 	return 0
 }
 
 func (Serve) Help() string {
 	helpText := `
-Usage: pinch serve [options] TEMPLATE
+Usage: pinch serve [options]
   Will execute multiple builds in parallel as defined in the template.
   The various artifacts created by the template will be outputted.
 Options:
   -debug                     Debug mode enabled for builds
-  -force                     Force a build to continue if artifacts exist, deletes existing artifacts
-  -machine-readable          Machine-readable output
-  -except=foo,bar,baz        Build all builds other than these
-  -only=foo,bar,baz          Only build the given builds by name
-  -parallel=false            Disable parallelization (on by default)
-  -var 'key=value'           Variable for templates, can be used multiple times.
-  -var-file=path             JSON file containing user variables.
 `
 
 	return strings.TrimSpace(helpText)

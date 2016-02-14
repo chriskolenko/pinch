@@ -1,6 +1,0 @@
----
-includes:
-  - ".pinch.yml"
-
-pre:
-  - print: "msg=\"Hi all what's the longhash $$LongHash\""
